@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR-Like GUI Overlay with YouTube Home</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
+
+        #cameraFeed {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .gui-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .gui-element {
+            position: absolute;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: auto; /* Allow clicking */
+        }
+
+        #youtubeEmbed {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 70%;
+            background: white;
+            z-index: 3;
+            display: none;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #youtubeEmbed iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video id="cameraFeed" autoplay playsinline></video>
+        <div class="gui-overlay">
+            <div class="gui-element" style="top: 20px; left: 20px;">Welcome to Dawn Quest</div>
+            <div class="gui-element" style="bottom: 20px; right: 20px;" onclick="openYouTube()"></div>
+        </div>
+    </div>
+
+    <div id="youtubeEmbed">
+        <button class="close-btn" onclick="closeYouTube()">Close</button>
+        <iframe src="https://www.youtube.com" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        async function startCamera() {
+            const video = document.getElementById('cameraFeed');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { exact: "environment" } }
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing the back camera:', err);
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                } catch (fallbackErr) {
+                    console.error('Error accessing the camera:', fallbackErr);
+                }
+            }
+        }
+
+        function openYouTube() {
+            document.getElementById('youtubeEmbed').style.display = 'block';
+        }
+
+        function closeYouTube() {
+            document.getElementById('youtubeEmbed').style.display = 'none';
+        }
+
+        window.addEventListener('load', startCamera);
+    </script>
+</body>
+</html>
